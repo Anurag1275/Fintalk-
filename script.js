@@ -47,7 +47,7 @@ const generateResponse = async (incomingChatLi) => {
             // Replace newlines with <br> tags
             generatedText = generatedText.replace(/\n/g, '<br>');
             // Clean up unwanted characters at the start of sentences
-            generatedText = generatedText.replace(/^[2#\*]+/, '');
+            generatedText = generatedText.replace(/^[##\**]+/, '');
             messageElement.innerHTML = generatedText;
         } else {
             messageElement.textContent = "Sorry, I couldn't process your message.";
