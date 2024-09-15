@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link type="image/png" sizes="16x16" rel="icon" href="icons8-bot-16.png">
     <title>Finance Chatbot</title>
     <style>
+        /* Your CSS styles */
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -203,7 +203,7 @@
 <div class="hero" id="home">
     <h1>Meet Your Finance Assistant</h1>
     <p>Instant budgeting tips and investment advice. Chat now to get started!</p>
-    <a href="#chat" class="cta-button">Chat Now</a>
+    <a href="#chat" class="cta-button chatbot-toggler">Chat Now</a>
 </div>
 
 <div id="features" class="hidden-section">
@@ -251,20 +251,24 @@
 
 <script>
     const ChatInput = document.querySelector(".chat-input textarea");
-    const sendChatbtn = document.querySelector(".send-btn");
+    const sendChatbtn = document.querySelector(".chat-input .send-btn");
     const chatbox = document.querySelector(".chatbox");
+    const chatbotToggler = document.querySelector(".chatbot-toggler");
     const chatbotCloseBtn = document.querySelector(".close-btn");
 
     let userMessage;
-    const API_KEY = "AIzaSyCTucn5YuHFa3lvdb3Ct5VJwHjn3J1RFLI"; // Replace with your actual API key
+    const API_KEY = "AIzaSyCTucn5YuHFa3lvdb3Ct5VJwHjn3J1RFLI";
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     const createChatLi = (message, className) => {
-        const chatLi = document.createElement("div");
+        const chatLi = document.createElement("li");
         chatLi.classList.add("chat", className);
-        let chatContent = `<p></p>`;
+        let chatContent = className === "outgoing" 
+            ? `<p></p>` 
+            : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
         chatLi.innerHTML = chatContent;
         chatLi.querySelector("p").textContent = message;
+
         return chatLi;
     };
 
@@ -277,72 +281,56 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                contents: [ { parts: [{ text: userMessage }] } ]
+                contents: [{ parts: [{ text: userMessage }] }]
             })
         };
 
         try {
             const response = await fetch(API_URL, requestOptions);
-            
-            if (response.ok) {
-                const data = await response.json();
-                const botMessage = data.generated_content;
-                messageElement.textContent = botMessage;
-            } else {
-                messageElement.textContent = "Error occurred while processing your request.";
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        } catch (error) {
-            messageElement.textContent = "Something went wrong. Please try again.";
-        }
 
-        chatbox.scrollTop = chatbox.scrollHeight; // Scroll to the latest message
+            const data = await response.json();
+            console.log("API Response:", data);
+
+            if (data.candidates && data.candidates.length > 0) {
+                const generatedText = data.candidates[0].content.parts[0].text;
+                messageElement.textContent = generatedText;
+            } else {
+                messageElement.textContent = "Sorry, I couldn't process your message.";
+            }
+
+        } catch (error) {
+            console.error("Error:", error.message || error);
+            messageElement.textContent = "Oops, something went wrong...";
+        } finally {
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        }
     };
 
     const handleChat = () => {
-        userMessage = ChatInput.value.trim(); // Get the user's input
+        userMessage = ChatInput.value.trim();
+        if (!userMessage) return;
+        ChatInput.value = "";
+        chatbox.appendChild(createChatLi(userMessage, "outgoing"));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
 
-        if (!userMessage) return; // If there's no message, do nothing
-
-        // Append user's message
-        const outgoingChatLi = createChatLi(userMessage, 'outgoing');
-        chatbox.appendChild(outgoingChatLi);
-
-        // Clear the input area
-        ChatInput.value = '';
-
-        // Scroll to the latest message
-        chatbox.scrollTop = chatbox.scrollHeight;
-
-        // Append bot's message placeholder
-        const incomingChatLi = createChatLi('Typing...', 'incoming');
-        chatbox.appendChild(incomingChatLi);
-
-        // Fetch the response from the API
-        generateResponse(incomingChatLi);
+        setTimeout(() => {
+            const incomingChatLi = createChatLi("Thinking...", "incoming");
+            chatbox.appendChild(incomingChatLi);
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+            generateResponse(incomingChatLi);
+        }, 600);
     };
 
-    sendChatbtn.addEventListener('click', handleChat);
-    ChatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleChat();
-        }
-    });
+    sendChatbtn.addEventListener("click", handleChat);
+    chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
+    chatbotCloseBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
 
-    // Toggle chatbot visibility
-    document.querySelector('.cta-button').addEventListener('click', () => {
-        document.body.classList.add('show-chatbot');
-    });
-
-    chatbotCloseBtn.addEventListener('click', () => {
-        document.body.classList.remove('show-chatbot');
-    });
-
-    // Toggle sections
-    function toggleSection(id) {
-        const sections = document.querySelectorAll('.hidden-section');
-        sections.forEach(section => section.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
+    function toggleSection(sectionId) {
+        document.querySelectorAll('.hidden-section').forEach(section => section.style.display = 'none');
+        document.getElementById(sectionId).style.display = 'block';
     }
 </script>
 
