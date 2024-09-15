@@ -3,149 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceBot</title>
+    <title>Finance Chatbot</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f5f7fa;
             color: #333;
-            background-color: #f4f8fb;
         }
         header {
-            background: #1c3d72;
+            background-color: #1d3557;
             color: #fff;
             padding: 20px 0;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         header .logo {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: bold;
+            letter-spacing: 2px;
         }
         nav {
             margin-top: 10px;
         }
         nav a {
             color: #fff;
-            margin: 0 20px;
+            margin: 0 15px;
             text-decoration: none;
             font-size: 16px;
+            transition: color 0.3s ease;
         }
         nav a:hover {
-            text-decoration: underline;
+            color: #fca311;
         }
         .hero {
-            background: linear-gradient(135deg, #2e93e6, #88c7f4);
+            background: linear-gradient(135deg, #457b9d, #1d3557);
             color: #fff;
             padding: 100px 20px;
             text-align: center;
-            position: relative;
         }
         .hero h1 {
-            font-size: 52px;
+            font-size: 48px;
             margin: 0;
-            line-height: 1.2;
-            font-weight: 700;
         }
         .hero p {
-            font-size: 24px;
+            font-size: 20px;
             margin: 20px 0;
-            font-weight: 300;
         }
         .cta-button {
-            background: #fff;
-            color: #2e93e6;
-            padding: 15px 35px;
-            text-decoration: none;
+            background-color: #fca311;
+            color: #fff;
+            padding: 15px 40px;
             border-radius: 50px;
-            font-size: 22px;
+            font-size: 18px;
+            text-transform: uppercase;
             font-weight: bold;
-            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
         }
         .cta-button:hover {
-            background: #f0f0f0;
+            background-color: #ffcb69;
         }
         .hidden-section {
             display: none;
-            padding: 80px 20px;
+            padding: 60px 20px;
             text-align: center;
         }
         .hidden-section h2 {
-            font-size: 42px;
-            margin-bottom: 40px;
-            color: #1c3d72;
-        }
-        .hidden-section p {
-            font-size: 20px;
-            line-height: 1.8;
-            color: #555;
+            font-size: 36px;
+            margin-bottom: 20px;
         }
         .hidden-section .feature, .hidden-section .testimonial {
             max-width: 600px;
-            margin: 30px auto;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-        .hidden-section .feature {
-            background: #f4f8fb;
-        }
-        .hidden-section .testimonial {
+            margin: 20px auto;
+            padding: 20px;
             background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .footer {
-            background: #1c3d72;
+            background-color: #1d3557;
             color: #fff;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
         }
         .footer a {
-            color: #fff;
+            color: #fca311;
             text-decoration: none;
-            margin: 0 10px;
-            font-weight: 600;
         }
         .footer a:hover {
             text-decoration: underline;
         }
-        .chatbot {
+
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 10000;
             background: #fff;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin: 40px auto;
-            max-width: 500px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            max-width: 90%;
             border-radius: 15px;
-            text-align: center;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .chatbot h2 {
-            margin-top: 0;
-            font-size: 26px;
-            color: #1c3d72;
-        }
-        .chatbot input[type="text"] {
-            width: calc(100% - 130px);
-            padding: 15px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-        }
-        .chatbot button {
-            padding: 12px 25px;
-            border: none;
-            background: #2e93e6;
+        .chatbot-header {
+            background-color: #1d3557;
             color: #fff;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
         }
-        .chatbot button:hover {
-            background: #1c3d72;
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .chatbox {
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        .chat.outgoing {
+            justify-content: flex-end;
+        }
+        .chat p {
+            background-color: #1d3557;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .chat.outgoing p {
+            background-color: #fca311;
+            color: #1d3557;
+        }
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fff;
+        }
+        .chat-input textarea {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            resize: none;
+            height: 40px;
+        }
+        .chat-input span {
+            padding: 0 15px;
+            cursor: pointer;
+            color: #fca311;
+            font-size: 20px;
+            line-height: 40px;
+        }
+
+        /* Show chatbot */
+        body.show-chatbot .chatbot-container {
+            display: flex;
         }
     </style>
 </head>
@@ -162,8 +200,8 @@
 </header>
 
 <div class="hero" id="home">
-    <h1>Your Personal Finance Assistant Awaits!</h1>
-    <p>Get instant insights, budgeting help, and investment advice from our smart chatbot.</p>
+    <h1>Meet Your Finance Assistant</h1>
+    <p>Instant budgeting tips and investment advice. Chat now to get started!</p>
     <a href="#chat" class="cta-button">Chat Now</a>
 </div>
 
@@ -171,53 +209,141 @@
     <h2>Features</h2>
     <div class="feature">
         <h3>Smart Budgeting</h3>
-        <p>Track and manage your spending with ease.</p>
+        <p>Easily track and manage your expenses.</p>
     </div>
     <div class="feature">
         <h3>Investment Insights</h3>
-        <p>Receive advice on potential investments.</p>
+        <p>Personalized investment advice to grow your wealth.</p>
     </div>
     <div class="feature">
         <h3>Savings Goals</h3>
-        <p>Set, monitor, and achieve your savings goals.</p>
-    </div>
-    <div class="feature">
-        <h3>Expense Tracking</h3>
-        <p>Get an overview of your monthly expenses.</p>
+        <p>Set and monitor your savings goals effectively.</p>
     </div>
 </div>
 
 <div id="functionality" class="hidden-section">
     <h2>Functionality</h2>
-    <p>Our chatbot is equipped to handle a wide range of financial tasks. From managing your budget, offering tailored investment advice, and tracking expenses, to helping you set realistic savings goals. With the power of AI, it provides personalized recommendations based on your financial data.</p>
+    <p>Our chatbot helps you with budgeting, investment advice, savings goals, and much more. All powered by AI.</p>
 </div>
 
 <div id="contact" class="hidden-section">
     <h2>Contact Us</h2>
     <p>Email: <a href="mailto:info@financebot.com">info@financebot.com</a></p>
-    <p>Connect with us: <a href="#">Facebook</a> | <a href="#">Twitter</a> | <a href="#">LinkedIn</a></p>
-</div>
-
-<div class="chatbot" id="chat">
-    <h2>Chat with Our Bot</h2>
-    <input type="text" placeholder="Type your message here...">
-    <button>Send</button>
+    <p>Follow us: <a href="#">Facebook</a> | <a href="#">Twitter</a> | <a href="#">LinkedIn</a></p>
 </div>
 
 <div class="footer">
     <p>&copy; 2024 FinanceBot. All rights reserved.</p>
 </div>
 
+<div class="chatbot-container" id="chat">
+    <div class="chatbot-header">
+        FinanceBot
+        <span class="close-btn">×</span>
+    </div>
+    <div class="chatbox"></div>
+    <div class="chat-input">
+        <textarea placeholder="Type your message..."></textarea>
+        <span class="send-btn">⮞</span>
+    </div>
+</div>
+
 <script>
-    function toggleSection(sectionId) {
-        const sections = document.querySelectorAll('.hidden-section');
-        sections.forEach(section => {
-            if (section.id === sectionId) {
-                section.style.display = section.style.display === 'block' ? 'none' : 'block';
+    const ChatInput = document.querySelector(".chat-input textarea");
+    const sendChatbtn = document.querySelector(".send-btn");
+    const chatbox = document.querySelector(".chatbox");
+    const chatbotCloseBtn = document.querySelector(".close-btn");
+
+    let userMessage;
+    const API_KEY = "YOUR_API_KEY_HERE";
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+    const createChatLi = (message, className) => {
+        const chatLi = document.createElement("li");
+        chatLi.classList.add("chat", className);
+        let chatContent = `<p></p>`;
+        chatLi.innerHTML = chatContent;
+        chatLi.querySelector("p").textContent = message;
+        return chatLi;
+    };
+
+    const generateResponse = async (incomingChatLi) => {
+        const messageElement = incomingChatLi.querySelector("p");
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: userMessage }]
+                }]
+            })
+        };
+
+        try {
+            const response = await fetch(API_URL, requestOptions);
+            
+            if (response.ok) {
+                const data = await response.json();
+                const botMessage = data.generated_content || "Sorry, I couldn't process that.";
+                messageElement.textContent = botMessage;
             } else {
-                section.style.display = 'none';
+                messageElement.textContent = "Error occurred while processing your request.";
             }
-        });
+        } catch (error) {
+            messageElement.textContent = "Something went wrong. Please try again.";
+        }
+
+        chatbox.scrollTop = chatbox.scrollHeight; // Scroll to the latest message
+    };
+
+    const handleChat = () => {
+        userMessage = ChatInput.value.trim(); // Get the user's input
+
+        if (!userMessage) return; // If there's no message, do nothing
+
+        // Append user's message
+        const outgoingChatLi = createChatLi(userMessage, 'outgoing');
+        chatbox.appendChild(outgoingChatLi);
+
+        // Clear the input area
+        ChatInput.value = '';
+
+        // Scroll to the latest message
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Append bot's message placeholder
+        const incomingChatLi = createChatLi('Typing...', 'incoming');
+        chatbox.appendChild(incomingChatLi);
+
+        // Fetch the response from the API
+        generateResponse(incomingChatLi);
+    };
+
+    sendChatbtn.addEventListener('click', handleChat);
+    ChatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleChat();
+        }
+    });
+
+    // Toggle chatbot visibility
+    document.querySelector('.cta-button').addEventListener('click', () => {
+        document.body.classList.add('show-chatbot');
+    });
+
+    chatbotCloseBtn.addEventListener('click', () => {
+        document.body.classList.remove('show-chatbot');
+    });
+
+    // Toggle sections
+    function toggleSection(id) {
+        const sections = document.querySelectorAll('.hidden-section');
+        sections.forEach(section => section.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
     }
 </script>
 
