@@ -43,8 +43,12 @@ const generateResponse = async (incomingChatLi) => {
         console.log("API Response:", data);
 
         if (data.candidates && data.candidates.length > 0) {
-            const generatedText = data.candidates[0].content.parts[0].text;
-            messageElement.textContent = generatedText;
+            let generatedText = data.candidates[0].content.parts[0].text;
+            // Replace newlines with <br> tags
+            generatedText = generatedText.replace(/\n/g, '<br>');
+            // Clean up unwanted characters at the start of sentences
+            generatedText = generatedText.replace(/^[2#\*]+/, '');
+            messageElement.innerHTML = generatedText;
         } else {
             messageElement.textContent = "Sorry, I couldn't process your message.";
         }
@@ -80,6 +84,3 @@ function toggleSection(sectionId) {
     document.querySelectorAll('.hidden-section').forEach(section => section.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
 }
-
-
-
