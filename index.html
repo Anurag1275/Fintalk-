@@ -255,11 +255,11 @@
     const chatbotCloseBtn = document.querySelector(".close-btn");
 
     let userMessage;
-    const API_KEY = "AIzaSyCTucn5YuHFa3lvdb3Ct5VJwHjn3J1RFLI";
+    const API_KEY = "AIzaSyCTucn5YuHFa3lvdb3Ct5VJwHjn3J1RFLI"; // Replace with your actual API key
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     const createChatLi = (message, className) => {
-        const chatLi = document.createElement("li");
+        const chatLi = document.createElement("div");
         chatLi.classList.add("chat", className);
         let chatContent = `<p></p>`;
         chatLi.innerHTML = chatContent;
@@ -276,9 +276,7 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: userMessage }]
-                }]
+                contents: [ { parts: [{ text: userMessage }] } ]
             })
         };
 
@@ -287,7 +285,7 @@
             
             if (response.ok) {
                 const data = await response.json();
-                const botMessage = data.generated_content || "Sorry, I couldn't process that.";
+                const botMessage = data.generated_content;
                 messageElement.textContent = botMessage;
             } else {
                 messageElement.textContent = "Error occurred while processing your request.";
