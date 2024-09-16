@@ -84,3 +84,54 @@ function toggleSection(sectionId) {
     document.querySelectorAll('.hidden-section').forEach(section => section.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
 }
+const micBtn = document.querySelector(".mic-btn");
+let recognition;
+let isListening = false;
+
+// Check if the browser supports the Web Speech API
+if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    // Start speech recognition
+    const startRecognition = () => {
+        recognition.start();
+        isListening = true;
+        micBtn.classList.add("active");
+    };
+
+    // Stop speech recognition
+    const stopRecognition = () => {
+        recognition.stop();
+        isListening = false;
+        micBtn.classList.remove("active");
+    };
+
+    // Handle results from speech recognition
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        ChatInput.value = transcript; // Set the recognized text into the input field
+        handleChat(); // Automatically send the message
+    };
+
+    // Handle speech recognition errors
+    recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        stopRecognition();
+    };
+
+    // Toggle voice search on click of the microphone button
+    micBtn.addEventListener("click", () => {
+        if (isListening) {
+            stopRecognition();
+        } else {
+            startRecognition();
+        }
+    });
+} else {
+    console.warn("Speech recognition not supported in this browser.");
+    micBtn.style.display = 'none'; // Hide mic button if speech recognition is not supported
+}
