@@ -8,6 +8,16 @@ let userMessage;
 const API_KEY = "AIzaSyCTucn5YuHFa3lvdb3Ct5VJwHjn3J1RFLI";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
+const YAHOO_API_URL = 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-similarities?symbol=INTC';
+const YAHOO_API_OPTIONS = {
+    method: 'GET',
+    headers: {
+        'x-rapidapi-key': '1f6c2357c1msh5284c807abcea8dp1c355djsn930dc4366699',
+        'x-rapidapi-host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
+    }
+};
+
+// Function to create chat bubbles
 const createChatLi = (message, className) => {
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", className);
@@ -20,6 +30,7 @@ const createChatLi = (message, className) => {
     return chatLi;
 };
 
+// Function to generate response from Gemini API
 const generateResponse = async (incomingChatLi) => {
     const messageElement = incomingChatLi.querySelector("p");
 
@@ -44,9 +55,7 @@ const generateResponse = async (incomingChatLi) => {
 
         if (data.candidates && data.candidates.length > 0) {
             let generatedText = data.candidates[0].content.parts[0].text;
-            // Replace newlines with <br> tags
             generatedText = generatedText.replace(/\n/g, '<br>');
-            // Clean up unwanted characters at the start of sentences
             generatedText = generatedText.replace(/^[##\**]+/, '');
             messageElement.innerHTML = generatedText;
         } else {
@@ -61,6 +70,34 @@ const generateResponse = async (incomingChatLi) => {
     }
 };
 
+// Function to handle stock data fetch from Yahoo Finance API
+const fetchStockData = async (incomingChatLi) => {
+    const messageElement = incomingChatLi.querySelector("p");
+
+    try {
+        const response = await fetch(YAHOO_API_URL, YAHOO_API_OPTIONS);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Yahoo API Response:", data);
+
+        if (data.finance && data.finance.similarities.length > 0) {
+            const stockList = data.finance.similarities.map(stock => `${stock.symbol}: ${stock.name}`).join(', ');
+            messageElement.innerHTML = `Similar stocks: ${stockList}`;
+        } else {
+            messageElement.textContent = "No similar stocks found.";
+        }
+    } catch (error) {
+        console.error("Error fetching stock data:", error);
+        messageElement.textContent = "Error fetching stock data. Please try again.";
+    } finally {
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+    }
+};
+
+// Main function to handle the chat input
 const handleChat = () => {
     userMessage = ChatInput.value.trim();
     if (!userMessage) return;
@@ -72,10 +109,16 @@ const handleChat = () => {
         const incomingChatLi = createChatLi("Thinking...", "incoming");
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
-        generateResponse(incomingChatLi);
+
+        if (userMessage.toLowerCase().includes("stock")) {
+            fetchStockData(incomingChatLi);  // Fetch stock data if the user mentions "stock"
+        } else {
+            generateResponse(incomingChatLi); // Otherwise, use the Gemini API
+        }
     }, 600);
 };
 
+// Event listeners
 sendChatbtn.addEventListener("click", handleChat);
 chatbotToggler.addEventListener("click", () => document.body.classList.toggle("show-chatbot"));
 chatbotCloseBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
@@ -84,11 +127,11 @@ function toggleSection(sectionId) {
     document.querySelectorAll('.hidden-section').forEach(section => section.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
 }
+
 const micBtn = document.querySelector(".mic-btn");
 let recognition;
 let isListening = false;
 
-// Check if the browser supports the Web Speech API
 if (window.SpeechRecognition || window.webkitSpeechRecognition) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
@@ -96,34 +139,29 @@ if (window.SpeechRecognition || window.webkitSpeechRecognition) {
     recognition.interimResults = false;
     recognition.lang = 'en-US';
 
-    // Start speech recognition
     const startRecognition = () => {
         recognition.start();
         isListening = true;
         micBtn.classList.add("active");
     };
 
-    // Stop speech recognition
     const stopRecognition = () => {
         recognition.stop();
         isListening = false;
         micBtn.classList.remove("active");
     };
 
-    // Handle results from speech recognition
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         ChatInput.value = transcript; // Set the recognized text into the input field
         handleChat(); // Automatically send the message
     };
 
-    // Handle speech recognition errors
     recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         stopRecognition();
     };
 
-    // Toggle voice search on click of the microphone button
     micBtn.addEventListener("click", () => {
         if (isListening) {
             stopRecognition();
