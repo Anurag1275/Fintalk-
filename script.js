@@ -8,8 +8,8 @@ let userMessage;
 const API_KEY = "AIzaSyCTucn5YuHFa3lvdb3Ct5VJwHjn3J1RFLI";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-// Twelve Data API for mutual funds
-const TWELVE_DATA_URL = 'https://twelve-data1.p.rapidapi.com/mutual_funds/world/ratings?symbol=VFIAX';
+// Updated Twelve Data API for mutual funds
+const TWELVE_DATA_URL = 'https://twelve-data1.p.rapidapi.com/mutual_fund_ratings?symbol=VFIAX'; // Corrected endpoint
 const TWELVE_DATA_OPTIONS = {
     method: 'GET',
     headers: {
@@ -36,11 +36,17 @@ const fetchMutualFundRatings = async (incomingChatLi) => {
     try {
         const response = await fetch(TWELVE_DATA_URL, TWELVE_DATA_OPTIONS);
         console.log('Response Status:', response.status);
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(`API Request Failed: ${response.status} - ${errorMessage}`);
+        }
+
         const data = await response.json();
         console.log("Twelve Data API Response:", data);
 
-        if (data && data.ratings && data.ratings.length > 0) {
-            const ratingDetails = data.ratings.map(rating => `Rating: ${rating.rating}, Date: ${rating.date}`).join(', ');
+        if (data && data.data && data.data.length > 0) {
+            const ratingDetails = data.data.map(rating => `Rating: ${rating.rating}, Date: ${rating.date}`).join(', ');
             messageElement.innerHTML = `VFIAX Ratings: ${ratingDetails}`;
         } else {
             messageElement.textContent = "No ratings found for VFIAX.";
